@@ -3,12 +3,15 @@ import sys
 import matplotlib.pyplot as plt
 from itertools import product
 from numpy.linalg import norm
+
+
 def object_function(xk):
-    x,y = xk
-    #f = 100 * (xk[0] ** 2 - xk[1]) ** 2 + (xk[0] - 1) ** 2
-    f = 2*x*x+((5/6)*y*y)+((2/5)*x*y)
-    #f =3*x*x-6*x*y+4*y*y+12*x-18*y+21
-    return f
+    x, y = xk
+    # z = 100 * (xk[0] ** 2 - xk[1]) ** 2 + (xk[0] - 1) ** 2
+    # z = 2*x*x+((5/6)*y*y)+((2/5)*x*y)
+    # z = 3*x*x-6*x*y+4*y*y+12*x-18*y+21
+    z = (5*x) / (x*x + y * y + 2)
+    return z
 
 
 def gradient_function(xk):
@@ -16,13 +19,18 @@ def gradient_function(xk):
     # gk = np.array([
     #	400 * (xk[0] ** 2 - xk[1]) * xk[0] + 2 * (xk[0] - 1), #	-200 * (xk[0] ** 2 - xk[1])
     # ])
-    gk = np.array([
-        float(2/3) * x + float(1/5) * y,
-        float(2/3) * y + float(1/5) * x
-    ])
+    # gk = np.array([
+    #     float(2/3) * x + float(1/5) * y,
+    #     float(2/3) * y + float(1/5) * x
+    # ])
     # gk = np.array([ #	6*x-6*y+12,
     #	-6*x+8*y-18 # ])
+    gk = np.array([
+        (5*(y*y+2-x*x))/((x*x+y*y+2)**2),
+        (-10*x*y)/((x*x+y*y+2)**2)
+    ])
     return gk
+
 
 def wolfe_powell(xk, sk):
     alpha = 1.0
@@ -47,10 +55,9 @@ def wolfe_powell(xk, sk):
     return alpha
 
 
-
 def create_mesh(f):
-    x = np.arange(-5, 5, 0.025)
-    y = np.arange(-5, 5, 0.025)
+    x = np.arange(-5, 5, 0.1)
+    y = np.arange(-5, 5, 0.1)
     X, Y = np.meshgrid(x, y)
     Z = np.zeros(X.shape)
     mesh_size = range(len(X))
@@ -63,10 +70,11 @@ def create_mesh(f):
 
 def plot_contour(ax, X, Y, Z):
     ax.set(
-        title='Conjugative Gradient Method',
+        title='Trajectory',
         xlabel='x1',
         ylabel='x2'
     )
+
     CS = ax.contour(X, Y, Z)
     ax.clabel(CS, fontsize='smaller', fmt='%1.2f')
     ax.axis('square')
@@ -80,7 +88,7 @@ def conjugate_gradient(x0, eps):
     sk = -gk
     step = 0
     prev_xk = xk-10 * eps
-    w = np.zeros ((2, 10 ** 3)) # Сохраняем итерацию и устанавливаем переменную xk
+    w = np.zeros ((2, 10 ** 3))  # Сохраняем итерацию и устанавливаем переменную xk
     curve_x = [x0]
     while norm(xk - prev_xk) > eps and step < 100:
         prev_xk = xk.copy()
@@ -94,12 +102,13 @@ def conjugate_gradient(x0, eps):
         miu = (np.linalg.norm(gk) / np.linalg.norm(g0))**2
         sk = -1 * gk + miu * sk
         sigma = np.linalg.norm(gk)
-    print("conjugate gradient iterations" + str(step))
-    print("conjugate gradient min" + str(curve_x[-1]))
+    print("conjugate gradient iterations " + str(step))
+    print("conjugate gradient min " + str(curve_x[-1]))
     return np.array(curve_x)
 
+
 eps = 1e-7
-x0 = np.array([-3.0,-4.0])
+x0 = np.array([-4.0, -1.0])
 xs = conjugate_gradient(x0, eps)
 
 fig, ax = plt.subplots(figsize=(6, 6))

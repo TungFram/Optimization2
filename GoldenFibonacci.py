@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-a = 0.1
-
 
 def gss(f, a, b, tol=1e-7):
     phi = (np.sqrt(5) + 1) / 2
@@ -47,8 +45,8 @@ def gradf(X):
 
 
 def create_mesh(f):
-    x = np.arange(-10, 10, 0.1)
-    y = np.arange(-10, 10, 0.1)
+    x = np.arange(-5, 5, 0.1)
+    y = np.arange(-5, 5, 0.1)
     X, Y = np.meshgrid(x, y)
     Z = np.zeros(X.shape)
     mesh_size = range(len(X))
@@ -60,9 +58,9 @@ def create_mesh(f):
     return X, Y, Z
 
 
-def plot_contour(ax, X, Y, Z):
+def plot_contour(ax, X, Y, Z, alpha):
     ax.set(
-        title='trajectory Optimization Process',
+        title='Trajectory with rate ' + str(alpha),
         xlabel='x1',
         ylabel='x2'
     )
@@ -85,7 +83,7 @@ def gradient_descent_gold(J, J_grad, x_init, epsilon=1e-7, max_iterations=1000):
         curve_x.append(x)
         if np.linalg.norm(J_grad(x)) < epsilon:
             print("min gradient_descent_gold " + str(curve_x[-1]))
-            print("iterations gradient_descent_gold successs" + str(num_iter))
+            print("iterations gradient_descent_gold success " + str(num_iter))
             return np.array(curve_x)
         num_iter+=1
     print("iterations gradient_descent_gold " + str(num_iter))
@@ -157,14 +155,14 @@ def fib(f, start, end, eps=1e-7):
             fd = f(d)
     return (start + end) / 2
 
-
-x_init = np.array([-5.0,-1.0])
-#xs = gradient_descent_fib(f, gradf, x_init, max_iterations=40000)
-xs = gradient_descent_gold(f, gradf, x_init, max_iterations=40000)
+a = 1
+x_init = np.array([-4.0, -1.0])
+xs = gradient_descent_fib(f, gradf, x_init, max_iterations=40000)
+# xs = gradient_descent_gold(f, gradf, x_init, max_iterations=40000)
 
 fig, ax = plt.subplots(figsize=(6, 6))
 X, Y, Z = create_mesh(f)
-ax = plot_contour(ax, X, Y, Z)
+ax = plot_contour(ax, X, Y, Z, a)
 xs = np.array(xs)
 ax.plot(xs[:,0], xs[:,1], linestyle='--', marker='o', color='orange')
 ax.plot(xs[-1,0], xs[-1,1], 'ro')
