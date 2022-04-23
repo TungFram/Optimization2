@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-a = 100
+a = 0.1
 
 
 def gss(f, a, b, tol=1e-7):
@@ -19,24 +19,26 @@ def gss(f, a, b, tol=1e-7):
 
 
 def f(X):
-    x,y =X
+    x, y = X
     # z = float(1/3) * x**2 + float(1/3) * y**2 + float(1/5) * y *x
-    #z =	3*x*x-6*x*y+4*y*y+12*x-18*y+21
-    z = 2*x*x+((5/6)*y*y)+((2/5)*x*y)
+    # z = 3*x*x-6*x*y+4*y*y+12*x-18*y+21
     # z = (1 - x)**2 + 100 * (y - x**2)**2
+    z = (5*x) / (x*x + y * y + 2)
     return z
 
 
 def dfdx(x, y):
     # return float(2/3) * x + float(1/5) * y
-    return 6*x-6*y+12
+    # return 6*x-6*y+12
     # return	2 * (x - 1) - 4 * 100 * x * (y - x**2)
+    return -10*((x*x)/((x*x+y*y+2)*(x*x+y*y+2)))+(5/(x*x+y*y+2))
 
 
 def dfdy(x, y):
     # return float(2/3) * y + float(1/5) * x
-    return -6*x+8*y-18
+    # return -6*x+8*y-18
     # return	2 * 100 * (y - x**2)
+    return -10*x*((y)/((x*x+y*y+2)*(x*x+y*y+2)))
 
 
 def gradf(X):
@@ -45,15 +47,16 @@ def gradf(X):
 
 
 def create_mesh(f):
-    x = np.arange(-2, 2, 0.1)
-    y = np.arange(-2, 2, 0.1)
+    x = np.arange(-10, 10, 0.1)
+    y = np.arange(-10, 10, 0.1)
     X, Y = np.meshgrid(x, y)
     Z = np.zeros(X.shape)
     mesh_size = range(len(X))
     for i in mesh_size:
-        for j in mesh_size: x_coor = X[i][j]
-        y_coor = Y[i][j]
-        Z[i][j] = f(np.array([x_coor, y_coor]))
+        for j in mesh_size:
+            x_coor = X[i][j]
+            y_coor = Y[i][j]
+            Z[i][j] = f(np.array([x_coor, y_coor]))
     return X, Y, Z
 
 
@@ -85,9 +88,9 @@ def gradient_descent_gold(J, J_grad, x_init, epsilon=1e-7, max_iterations=1000):
             print("iterations gradient_descent_gold successs" + str(num_iter))
             return np.array(curve_x)
         num_iter+=1
-        print("iterations gradient_descent_gold " + str(num_iter))
-        print("min gradient_descent_gold " + str(curve_x[-1]))
-        return np.array(curve_x)
+    print("iterations gradient_descent_gold " + str(num_iter))
+    print("min gradient_descent_gold " + str(curve_x[-1]))
+    return np.array(curve_x)
 
 
 def gradient_descent_fib(J, J_grad, x_init, epsilon=1e-7, max_iterations=1000):
@@ -102,7 +105,7 @@ def gradient_descent_fib(J, J_grad, x_init, epsilon=1e-7, max_iterations=1000):
         curve_x.append(x)
         if np.linalg.norm(J_grad(x)) < epsilon:
             print("min gradient_descent_fib " + str(curve_x[-1]))
-            print("iterations gradient_descent_fib successs " + str(num_iter))
+            print("iterations gradient_descent_fib success " + str(num_iter))
             return np.array(curve_x)
         num_iter += 1
     print("iterations gradient_descent_fib " + str(num_iter))
@@ -155,7 +158,7 @@ def fib(f, start, end, eps=1e-7):
     return (start + end) / 2
 
 
-x_init = np.array([-1.0,-0.0])
+x_init = np.array([-5.0,-1.0])
 #xs = gradient_descent_fib(f, gradf, x_init, max_iterations=40000)
 xs = gradient_descent_gold(f, gradf, x_init, max_iterations=40000)
 
